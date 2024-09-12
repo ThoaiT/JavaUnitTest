@@ -1,0 +1,83 @@
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.List;
+
+import com.example.MenuSystem;
+import com.example.Airline;
+import com.example.Flight;
+
+public class MenuSystemTest {
+    private MenuSystem menuSystem;
+
+    @BeforeEach
+    public void setUp() {
+        menuSystem = new MenuSystem();
+    }
+
+    @Test
+    public void testSetupAirlines() {
+        // Kiểm tra nếu setupAirlines() hoạt động đúng
+        List<Airline> airlines = menuSystem.getAirlines();
+        assertEquals(2, airlines.size(), "Số lượng airlines phải là 2.");
+        assertEquals("Qantas", airlines.get(0).getName());
+        assertEquals("Air New Zealand", airlines.get(1).getName());
+    }
+
+    @Test
+    public void testBookFlight() {
+        // Mock input
+        String input = "QF241\n1\nJohn Doe\n25\n0\n";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+
+        // Chạy phương thức bookFlight
+        menuSystem.bookFlight();
+
+        // Kiểm tra nếu hành khách đã được đặt chỗ thành công
+        Airline qantas = menuSystem.getAirlines().get(0);
+        Flight flight = qantas.getFlight(0);  // Flight ID QF241
+        assertNotNull(flight.getPassenger(0));
+        assertEquals("John Doe", flight.getPassenger(0).getName());
+    }
+
+    @Test
+    public void testCancelBooking() {
+        // Giả lập việc đặt chỗ trước
+        String input = "QF241\n1\nJohn Doe\n25\n0\n";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        menuSystem.bookFlight();
+
+        // Mock input cho việc hủy đặt chỗ
+        String cancelInput = "QF241\n1\nJohn Doe\n";
+        in = new ByteArrayInputStream(cancelInput.getBytes());
+        System.setIn(in);
+
+        // Chạy phương thức cancelBooking
+        menuSystem.cancelBooking();
+
+        // Kiểm tra nếu hành khách đã bị hủy đặt chỗ thành công
+        Airline qantas = menuSystem.getAirlines().get(0);
+        Flight flight = qantas.getFlight(0);  // Flight ID QF241
+        assertNull(flight.getPassenger(0));
+    }
+
+    @Test
+    public void testViewDepartingFlights() {
+        // Mock input để xem các chuyến bay khởi hành từ Melbourne
+        String input = "Melbourne\n";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+
+        // Chạy phương thức viewDepartingFlights
+        menuSystem.viewDepartingFlights();
+
+        // Kiểm tra xem các chuyến bay có khởi hành từ Melbourne được hiển thị đúng
+        Airline qantas = menuSystem.getAirlines().get(0);
+        assertEquals("Melbourne", qantas.getFlight(0).getStartAirport());
+        assertEquals("Melbourne", qantas.getFlight(1).getStartAirport());
+    }
+}

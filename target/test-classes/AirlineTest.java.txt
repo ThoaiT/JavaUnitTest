@@ -1,0 +1,69 @@
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import com.example.Airline;
+import com.example.Flight;
+
+public class AirlineTest {
+
+    private Airline airline;
+
+    @BeforeEach
+    public void setUp() {
+        // Khởi tạo đối tượng Airline trước mỗi bài kiểm tra
+        airline = new Airline("Test Airline");
+    }
+
+    @Test
+    public void testAddFlight() {
+        // Thêm một chuyến bay và kiểm tra xem nó đã được thêm thành công chưa
+        airline.addFlight("Melbourne", "Sydney", "QF241", "8:48am", "22 Sept");
+        assertEquals(1, airline.getNumberOfFlights());
+        Flight flight = airline.getFlight("QF241");
+        assertNotNull(flight);
+        assertEquals("Melbourne", flight.getStartAirport());
+        assertEquals("Sydney", flight.getDestAirport());
+    }
+
+    @Test
+    public void testAddDuplicateFlight() {
+        // Thêm một chuyến bay với cùng một ID và kiểm tra xem nó không được thêm lần nữa
+        airline.addFlight("Melbourne", "Sydney", "QF241", "8:48am", "22 Sept");
+        airline.addFlight("Melbourne", "Adelaide", "QF241", "10:35am", "22 Sept");
+        assertEquals(1, airline.getNumberOfFlights());
+    }
+
+    @Test
+    public void testGetFlightByPosition() {
+        // Thêm một chuyến bay và kiểm tra xem có thể lấy chuyến bay bằng vị trí không
+        airline.addFlight("Melbourne", "Sydney", "QF241", "8:48am", "22 Sept");
+        Flight flight = airline.getFlight(0);
+        assertNotNull(flight);
+        assertEquals("QF241", flight.getFlightID());
+    }
+
+    @Test
+    public void testGetFlightByInvalidPosition() {
+        // Kiểm tra khi vị trí không hợp lệ
+        assertNull(airline.getFlight(-1));
+        assertNull(airline.getFlight(0));
+    }
+
+    @Test
+    public void testGetFlightByID() {
+        // Thêm chuyến bay và kiểm tra xem có thể lấy chuyến bay bằng ID không
+        airline.addFlight("Melbourne", "Sydney", "QF241", "8:48am", "22 Sept");
+        Flight flight = airline.getFlight("QF241");
+        assertNotNull(flight);
+        assertEquals("8:48am", flight.getDepartTime());
+    }
+
+    @Test
+    public void testGetFlightByInvalidID() {
+        // Kiểm tra khi ID không hợp lệ
+        assertNull(airline.getFlight("INVALID"));
+    }
+}
+
